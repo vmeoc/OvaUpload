@@ -13,19 +13,19 @@ param (
 )
 
 #Credentials to connect to vCenter
-$vCenter="vcsa.cpod-vic.shwrfr.mooo.com"
+$vCenter="vcsa-01a.corp.local"
 $vCenterLogin="administrator@vsphere.local"
 $vCenterPasswd="VMware1!"
-$Cluster="Cluster"
+$Cluster="Cluster site A"
 
 #Settings to set in each deployment
 #Network settings
-$Gateway="172.18.1.1"
+$Gateway="192.168.110.1"
 $Domain="My.domain.com"
-$SearchPath="cpod-vic.shwrfr.mooo.com"
-$DNS="172.18.1.1"
+$SearchPath="My.domain.com"
+$DNS="192.168.110.10"
 $Netmask="255.255.255.0"
-$NetworkMapping="DPortGroup"
+$NetworkMapping="VM Network"
 $Protocol="IPv4"
 
 #User/pass
@@ -90,10 +90,10 @@ $vRAConfig = @{
 $vROpsConfig = @{
 "vami.DNS.vRealize_Operations_Manager_Appliance"= $DNS
 "vami.netmask0.vRealize_Operations_Manager_Appliance" = $Netmask
-"vami.gateway.vRealize_Operations_Manager_Appliance" = =Gateway
+"vami.gateway.vRealize_Operations_Manager_Appliance" = $Gateway
 "forceIpv6"= $False
 "vamitimezone" = $Timezone
-"DeploymentOption" = $DeploymentOption
+#"DeploymentOption" = $DeploymentOption
 "vami.ip0.vRealize_Operations_Manager_Appliance" = $IP
 "NetworkMapping.Network 1" = $NetworkMapping
 "IpAssignment.IpProtocol" = $Protocol
@@ -101,10 +101,11 @@ $vROpsConfig = @{
 
 ########################################################################################################
 write-host("Summary of the settings ")
-$vRAconfig | ft –autosize
+$vROpsconfig | ft –autosize
 
 switch ($OVAType)
     {
         vRA {Import-VApp –Source $ovfpath –OvfConfiguration $VRAconfig –Name $vmname –VMHost $myhost –Datastore $datastore –DiskStorageFormat Thin}
         vRB {Import-VApp –Source $ovfpath –OvfConfiguration $LIconfig –Name $vmname –VMHost $myhost –Datastore $datastore –DiskStorageFormat Thin}
+        vROps {Import-VApp –Source $ovfpath –OvfConfiguration $VROpsconfig –Name $vmname –VMHost $myhost –Datastore $datastore –DiskStorageFormat Thin}
 }
